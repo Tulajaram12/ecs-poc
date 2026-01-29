@@ -1,0 +1,28 @@
+version: 0.2
+
+env:
+  variables:
+    IMAGE_TAG: latest
+
+phases:
+  pre_build:
+    commands:
+      - echo "Logging in to Amazon ECR..."
+      - aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin 484468819850.dkr.ecr.ap-southeast-2.amazonaws.com
+  build:
+    commands:
+      - echo "Building Docker image..."
+      - docker build -t ecsapp/user-service .
+      - docker tag ecsapp/user-service:latest 484468819850.dkr.ecr.ap-southeast-2.amazonaws.com/ecsapp/user-service:latest
+  post_build:
+    commands:
+      - echo "Pushing Docker image..."
+      - docker push 484468819850.dkr.ecr.ap-southeast-2.amazonaws.com/ecsapp/user-service:latest
+      - echo "Writing image definitions file..."
+      - printf '[{"name":"container","imageUri":"%s"}]' \
+        484468819850.dkr.ecr.ap-southeast-2.amazonaws.com/ecsapp/user-service:latest > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
+
