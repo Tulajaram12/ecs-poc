@@ -25,4 +25,5 @@ phases:
 artifacts:
   files:
     - imagedefinitions.json
+  name: BuildArtifact
 
