@@ -19,7 +19,7 @@ phases:
       - echo "Pushing Docker image..."
       - docker push 484468819850.dkr.ecr.ap-southeast-2.amazonaws.com/ecsapp/payment-service:latest
       - echo "Writing image definitions file..."
-      - printf '[{"name":"container","imageUri":"%s"}]' \
+      - printf '[{"name":"payment-container","imageUri":"%s"}]' \
         484468819850.dkr.ecr.ap-southeast-2.amazonaws.com/ecsapp/payment-service:latest > imagedefinitions.json
 
 artifacts:
