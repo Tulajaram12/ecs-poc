@@ -12,7 +12,7 @@ phases:
   build:
     commands:
       - echo "Building Docker image..."
-      - docker build -t ecsapp/payment-service .
+      - docker build -t ecsapp/payment-service payment-service/
       - docker tag ecsapp/payment-service:latest 484468819850.dkr.ecr.ap-southeast-2.amazonaws.com/ecsapp/payment-service:latest
   post_build:
     commands:
