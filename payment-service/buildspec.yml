@@ -2,29 +2,34 @@ version: 0.2
 
 env:
   variables:
+    AWS_ACCOUNT_ID: 484468819850
+    AWS_REGION: ap-southeast-2
+    IMAGE_REPO_NAME: ecsapp/payment-service
     IMAGE_TAG: latest
+    CONTAINER_NAME: payment-container
 
 phases:
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR..."
-      - aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin 484468819850.dkr.ecr.ap-southeast-2.amazonaws.com
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
   build:
     commands:
       - echo "Building Docker image..."
-      - docker build -t ecsapp/payment-service payment-service/
-      - docker tag ecsapp/payment-service:latest 484468819850.dkr.ecr.ap-southeast-2.amazonaws.com/ecsapp/payment-service:latest
+      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG payment-service/
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+
   post_build:
     commands:
       - echo "Pushing Docker image..."
-      - docker push 484468819850.dkr.ecr.ap-southeast-2.amazonaws.com/ecsapp/payment-service:latest
-      - echo "Writing image definitions file..."
-      - printf '[{"name":"payment-container","imageUri":"%s"}]' \
-        484468819850.dkr.ecr.ap-southeast-2.amazonaws.com/ecsapp/payment-service:latest > ./imagedefinitions.json
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+
+      - echo "Creating imagedefinitions.json..."
+      - IMAGE_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - echo "[{\"name\":\"$CONTAINER_NAME\",\"imageUri\":\"$IMAGE_URI\"}]" > imagedefinitions.json
       - cat imagedefinitions.json
 
 artifacts:
   files:
     - imagedefinitions.json
-  name: BuildArtifact
-
