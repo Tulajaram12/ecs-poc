@@ -11,7 +11,7 @@ def payments():
     return jsonify({
         "service": "payment-service",
         "payments": [
-            {"id": 101, "amount": 500},
+            {"id": 103, "amount": 500},
             {"id": 102, "amount": 1200}
         ]
     })
